@@ -9,6 +9,7 @@ services:
             - "8337:8337"
         volumes:
             - .:/app:rw
+            - /app/var/
         environment:
             - APP_ENV=dev
 

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\CouponTypeEnum;
 use App\Repository\CouponRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,8 +19,8 @@ class Coupon
     #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $code;
 
-    #[ORM\Column(type: 'string', length: 10)]
-    private string $type;
+    #[ORM\Column(type: 'string', enumType: CouponTypeEnum::class)]
+    private CouponTypeEnum $type;
 
     #[ORM\Column(type: 'float')]
     private float $value;
@@ -40,12 +41,12 @@ class Coupon
         return $this;
     }
 
-    public function getType(): string
+    public function getType(): CouponTypeEnum
     {
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(CouponTypeEnum $type): self
     {
         $this->type = $type;
         return $this;
