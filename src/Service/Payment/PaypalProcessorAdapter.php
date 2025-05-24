@@ -10,11 +10,11 @@ use App\Exception\PaymentFailedException;
 use App\Service\PriceCalculatorService;
 use Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor;
 
-readonly class PaypalProcessorAdapter implements PaymentProcessorInterface
+class PaypalProcessorAdapter implements PaymentProcessorInterface
 {
     public function __construct(
-        private PaypalPaymentProcessor $paypal,
-        private PriceCalculatorService $calculator
+        private readonly PaypalPaymentProcessor $paypal,
+        private readonly PriceCalculatorService $calculator
     ) {}
 
     public function pay(Product $product, ?Coupon $coupon, string $vatNumber): string

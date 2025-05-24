@@ -7,11 +7,11 @@ namespace App\Service\Payment;
 use App\Enum\PaymentProcessorTypeEnum;
 use App\Exception\PaymentFailedException;
 
-readonly class PaymentProcessorResolver
+class PaymentProcessorResolver
 {
     public function __construct(
-        private StripeProcessorAdapter $stripe,
-        private PaypalProcessorAdapter $paypal
+        private readonly StripeProcessorAdapter $stripe,
+        private readonly PaypalProcessorAdapter $paypal
     ) {}
 
     /**

@@ -10,11 +10,11 @@ use App\Exception\PaymentFailedException;
 use App\Service\PriceCalculatorService;
 use Systemeio\TestForCandidates\PaymentProcessor\StripePaymentProcessor;
 
-readonly class StripeProcessorAdapter implements PaymentProcessorInterface
+class StripeProcessorAdapter implements PaymentProcessorInterface
 {
     public function __construct(
-        private StripePaymentProcessor $stripe,
-        private PriceCalculatorService $calculator
+        private readonly StripePaymentProcessor $stripe,
+        private readonly PriceCalculatorService $calculator
     ) {}
 
     public function pay(Product $product, ?Coupon $coupon, string $vatNumber): string
