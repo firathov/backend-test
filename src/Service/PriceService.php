@@ -4,28 +4,24 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Dto\PurchaseRequestDto;
-use App\Exception\PaymentFailedException;
+use App\Dto\PriceRequestDto;
 use App\Repository\ProductRepository;
 use App\Repository\CouponRepository;
-use App\Service\Payment\PaymentProcessorResolver;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class PurchaseService
+class PriceService
 {
     public function __construct(
         private readonly ProductRepository $productRepo,
         private readonly CouponRepository  $couponRepo,
-        private readonly PaymentProcessorResolver $resolver
+        private readonly PriceCalculatorService $calculator
     ) {}
 
-    /**
-     * @throws \InvalidArgumentException|PaymentFailedException
-     */
-    public function purchase(PurchaseRequestDto $dto): string
+    public function calculate(PriceRequestDto $dto): array
     {
         $product = $this->productRepo->find($dto->product);
         if (!$product) {
-            throw new \InvalidArgumentException('Product not found');
+            throw new NotFoundHttpException('Product not found');
         }
 
         $coupon = null;
@@ -36,7 +32,6 @@ class PurchaseService
             }
         }
 
-        $processor = $this->resolver->getProcessor($dto->paymentProcessor);
-        return $processor->pay($product, $coupon, $dto->taxNumber);
+        return $this->calculator->calculate($product, $coupon, $dto->taxNumber);
     }
 }

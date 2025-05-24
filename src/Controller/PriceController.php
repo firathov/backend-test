@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Dto\PriceRequestDto;
-use App\Repository\ProductRepository;
-use App\Repository\CouponRepository;
-use App\Service\PriceCalculatorService;
+use App\Service\PriceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PriceController extends AbstractController
@@ -18,24 +17,16 @@ class PriceController extends AbstractController
     #[Route('/calculate-price', name: 'calculate_price', methods: ['POST'])]
     public function calculatePrice(
         #[MapRequestPayload] PriceRequestDto $dto,
-        ProductRepository $productRepo,
-        CouponRepository $couponRepo,
-        PriceCalculatorService $priceCalculatorService
+        PriceService $priceService
     ): JsonResponse {
-        $product = $productRepo->find($dto->product);
-        if (!$product) {
-            return $this->json(['error' => 'Product not found'], 404);
+        try {
+            $result = $priceService->calculate($dto);
+        } catch (NotFoundHttpException $e) {
+            return $this->json(['error' => $e->getMessage()], 404);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
         }
 
-        $coupon = null;
-        if ($dto->couponCode) {
-            $coupon = $couponRepo->findOneBy(['code' => $dto->couponCode]);
-            if (!$coupon) {
-                return $this->json(['error' => 'Invalid coupon code'], 400);
-            }
-        }
-
-        $result = $priceCalculatorService->calculate($product, $coupon, $dto->taxNumber);
         return $this->json($result);
     }
 }
